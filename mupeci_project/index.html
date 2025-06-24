@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUPECI - Système de Gestion des Visiteurs</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-section">
+            <div class="logo-container">
+                <div class="logo">📋</div>
+                <h1>MUPECI</h1>
+                <p class="subtitle">Système de Gestion des Visiteurs</p>
+            </div>
+            
+            <div class="access-cards">
+                <div class="access-card">
+                    <div class="card-icon">👥</div>
+                    <h3>Accès Réceptionniste</h3>
+                    <p>Gestion quotidienne des visiteurs et de la file d'attente</p>
+                    <button onclick="showLogin('receptionist')" class="btn btn-primary">Se Connecter</button>
+                </div>
+                
+                <div class="access-card">
+                    <div class="card-icon">⚙️</div>
+                    <h3>Accès Administrateur</h3>
+                    <p>Administration complète du système et gestion des utilisateurs</p>
+                    <button onclick="showLogin('admin')" class="btn btn-secondary">Administration</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de connexion -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="form-header">
+                <h2 id="loginTitle">Connexion</h2>
+                <p id="loginSubtitle">Accédez à votre espace de travail</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="marie@mupeci.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" value="password123" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">Se Connecter</button>
+            </form>
+            
+            <div class="login-help">
+                <p><strong>Comptes de test :</strong></p>
+                <p>Réceptionniste: marie@mupeci.com / password123</p>
+                <p>Administrateur: admin@mupeci.com / admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interface Réceptionniste -->
+    <div id="receptionistInterface" class="interface" style="display: none;">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>MUPECI - Réception</h1>
+                <div class="user-info">
+                    <span>Bonjour, Marie Dupont</span>
+                    <button onclick="showDashboard()" class="btn btn-sm">Tableau de Bord</button>
+                    <button onclick="logout()" class="btn btn-sm btn-secondary">Déconnexion</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="section">
+                <h2>Enregistrement des Visiteurs</h2>
+                <form class="visitor-form" onsubmit="addVisitor(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="visitorName">Nom Complet *</label>
+                            <input type="text" id="visitorName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="visitorPhone">Téléphone *</label>
+                            <input type="tel" id="visitorPhone" placeholder="+237XXXXXXXXX" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="visitorEmail">Email</label>
+                            <input type="email" id="visitorEmail">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="visitorId">Numéro Pièce d'Identité *</label>
+                            <input type="text" id="visitorId" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="department">Département *</label>
+                            <select id="department" required>
+                                <option value="">Sélectionner un département</option>
+                                <option value="Direction Générale">Direction Générale</option>
+                                <option value="Ressources Humaines">Ressources Humaines</option>
+                                <option value="Comptabilité">Comptabilité</option>
+                                <option value="Service Client">Service Client</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="purpose">Objet de la visite</label>
+                            <select id="purpose">
+                                <option value="visite">Visite</option>
+                                <option value="rendez-vous">Rendez-vous</option>
+                                <option value="autres">Autres</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Enregistrer le Visiteur</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>File d'Attente Active</h2>
+                <div id="queueTable">
+                    <table class="visitors-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Département</th>
+                                <th>Objet</th>
+                                <th>Heure d'arrivée</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="queueBody">
+                            <tr>
+                                <td>Jean Mballa</td>
+                                <td>Direction Générale</td>
+                                <td>Rendez-vous</td>
+                                <td>09:30</td>
+                                <td><span class="status status-waiting">En attente</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="startVisit(this)">Démarrer</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Marie Fotso</td>
+                                <td>Comptabilité</td>
+                                <td>Visite</td>
+                                <td>10:15</td>
+                                <td><span class="status status-in-progress">En cours</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" onclick="completeVisit(this)">Terminer</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau de Bord -->
+    <div id="dashboardInterface" class="interface" style="display: none;">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>MUPECI - Tableau de Bord</h1>
+                <div class="user-info">
+                    <span>Bonjour, Marie Dupont</span>
+                    <button onclick="showReception()" class="btn btn-sm">Réception</button>
+                    <button onclick="logout()" class="btn btn-sm btn-secondary">Déconnexion</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-content">
+                        <h3>3</h3>
+                        <p>En Attente</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <h3>12</h3>
+                        <p>Reçus Aujourd'hui</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🏢</div>
+                    <div class="stat-content">
+                        <h3>4</h3>
+                        <p>Départements Actifs</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-content">
+                        <h3>5</h3>
+                        <p>Rendez-vous</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Classement des Départements</h3>
+                    <div class="department-ranking">
+                        <div class="ranking-item">
+                            <div class="rank-badge rank-1">1</div>
+                            <div class="dept-info">
+                                <span class="dept-name">Direction Générale</span>
+                                <span class="dept-count">5 visiteurs</span>
+                            </div>
+                        </div>
+                        <div class="ranking-item">
+                            <div class="rank-badge rank-2">2</div>
+                            <div class="dept-info">
+                                <span class="dept-name">Service Client</span>
+                                <span class="dept-count">4 visiteurs</span>
+                            </div>
+                        </div>
+                        <div class="ranking-item">
+                            <div class="rank-badge rank-3">3</div>
+                            <div class="dept-info">
+                                <span class="dept-name">Comptabilité</span>
+                                <span class="dept-count">2 visiteurs</span>
+                            </div>
+                        </div>
+                        <div class="ranking-item">
+                            <div class="rank-badge rank-4">4</div>
+                            <div class="dept-info">
+                                <span class="dept-name">Ressources Humaines</span>
+                                <span class="dept-count">1 visiteur</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Affluence par Heure</h3>
+                    <canvas id="hourlyChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Historique des Visites Terminées</h2>
+                <table class="visitors-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Département</th>
+                            <th>Objet</th>
+                            <th>Arrivée</th>
+                            <th>Fin</th>
+                            <th>Durée</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Paul Nkomo</td>
+                            <td>Direction Générale</td>
+                            <td>Rendez-vous</td>
+                            <td>08:30</td>
+                            <td>09:15</td>
+                            <td>45 min</td>
+                        </tr>
+                        <tr>
+                            <td>Sophie Kamga</td>
+                            <td>Ressources Humaines</td>
+                            <td>Visite</td>
+                            <td>09:00</td>
+                            <td>09:30</td>
+                            <td>30 min</td>
+                        </tr>
+                        <tr>
+                            <td>André Tchoumi</td>
+                            <td>Service Client</td>
+                            <td>Autres</td>
+                            <td>10:00</td>
+                            <td>10:20</td>
+                            <td>20 min</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
